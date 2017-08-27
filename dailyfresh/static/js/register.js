@@ -9,6 +9,7 @@ $(function(){
 
 	$('#user_name').blur(function() {
 		check_user_name();
+		check_user_name_exist2(true)
 	});
 
 	$('#pwd').blur(function() {
@@ -37,6 +38,45 @@ $(function(){
 		}
 	});
 
+	function check_user_name_exist2(async){
+		// 1.获取用户名
+		username = $('#user_name').val()
+
+		//　２．发起一个ａｊａｘ请求校验用户名是否存在
+		$.ajax({
+			'url':'/user/check_user_name_exist/?username='+username,
+			'async':false,
+			'success':function(data){
+				//进行处理
+				if (data.res == 0){
+					$('#user_name').next().text('用户名已注册').show()
+					error_name = true
+				}
+				else{
+					$('#user_name').next().text('').hide()
+					error_name = false
+				}
+
+			}
+		})
+	}
+
+	function check_user_name_exist(){
+		// 1.获取用户名
+		username = $('#user_name').val()
+		//　２．发起一个ａｊａｘ请求校验用户迷宫是否存在
+		$.get('/user/check_user_name_exist/?username='+username, function(data){
+			if (data.res == 0){
+				$('#user_name').next().text('用户名已注册').show()
+				error_name=true
+			}
+			else
+			{
+				$('#user_name').next().text('').hide()
+				error_name=false
+			}
+		})
+	}
 
 	function check_user_name(){
 		var len = $('#user_name').val().length;
@@ -107,6 +147,7 @@ $(function(){
 
 	$('#reg_form').submit(function() {
 		check_user_name();
+		check_user_name_exist2(false);
 		check_pwd();
 		check_cpwd();
 		check_email();
