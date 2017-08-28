@@ -80,7 +80,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'dailyfresh01',
-        'PORT': '3306',
+        'PORT': 3306,
         'USER': 'root',
         'HOST': 'localhost',
         'PASSWORD': 'mysql',
@@ -106,7 +106,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFIELS_DIRS = [
+STATICFILES_DIRS = [
     # 设置静态文件存放的物理目录
     os.path.join(BASE_DIR, 'static')
 ]

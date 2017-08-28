@@ -3,5 +3,5 @@ from df_user import views
 
 
 urlpatterns = [
-    url(r'^index$', views.index)
+    url(r'^register/$', views.register)
 ]
