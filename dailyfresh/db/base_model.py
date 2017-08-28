@@ -1,4 +1,3 @@
-# coding=utf-8
 from django.db import models
 
 
@@ -11,4 +10,4 @@ class BaseModel(models.Model):
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 
     class Meta:
-        abstract = True # 说明是一个抽象模型类
+        abstract = True  # 说明是一个抽象模型类

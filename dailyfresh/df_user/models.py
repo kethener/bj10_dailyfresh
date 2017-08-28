@@ -1,15 +1,15 @@
-# coding=utf-8
 from django.db import models
-from db.base_model import BaseModel
+from db.base_model import BaseModel # 导入抽象模型基类
+from db.base_manager import BaseManager # 导入抽象模型管理器记录
 from utils.get_hash import get_hash
 # Create your models here.
 
 
-class PassportManager(models.Manager):
+class PassportManager(BaseManager):
     '''
     用户模型管理器类
     '''
-    def add_one_passport(self, username, password, email):
+    def add_one_passport1(self, username, password, email):
         '''
         添加一个用户账户信息
         '''
@@ -25,7 +25,14 @@ class PassportManager(models.Manager):
         # 返回模型类对象
         return passport
 
-    def get_one_passport(self, username, password=None):
+    def add_one_passport(self, username, password, email):
+        '''
+        添加一个用户账户信息
+        '''
+        passport = self.create_one_object(username=username, password=get_hash(password), email=email)
+        return  passport
+
+    def get_one_passport1(self, username, password=None):
         '''
         根据用户名密码查询账户信息
         '''
@@ -40,11 +47,22 @@ class PassportManager(models.Manager):
             passport = None
         return passport
 
+    def get_one_passport(self, username, password=None):
+        '''
+        根据用户名密码查询账户信息
+        '''
+        if password is None:
+            # 根据用户名查找账户信息
+            passport = self.get_one_object(username=username)
+        else:
+            # 根据用户名和密码查询账户信息
+            passport = self.get_one_object(username=username, password=get_hash(password))
+        return passport
+
 # Passport.objects.add_one_passport()
 # Passport.objects.get_one_passport()
-
-
-class Passport(models.Model):
+# Passport.objects.get_all_valid_fields()
+class Passport(BaseModel):
     '''
     用户账户模型类
     '''
@@ -56,3 +74,63 @@ class Passport(models.Model):
 
     class Meta:
         db_table = 's_user_account' # 指定表名
+
+
+class AddressManager(BaseManager):
+    '''
+    地址模型管理器类
+    '''
+    def get_default_address(self, passport_id):
+        '''
+        获取账户的默认收货地址
+        '''
+        addr = self.get_one_object(passport_id=passport_id, is_def=True)
+        return addr
+
+    def add_one_address(self, passport_id, recipient_name, recipient_addr,
+                        recipient_phone, zip_code):
+        '''
+        添加一个收货地址信息
+        '''
+        # 1.查询用户是否有默认收货地址
+        def_addr = self.get_default_address(passport_id=passport_id)
+        # 2.判断
+        if def_addr is None:
+            # 用户没有默认收货地址
+            addr = self.create_one_object(passport_id=passport_id, recipient_name=recipient_name,
+                                   recipient_addr=recipient_addr, recipient_phone=recipient_phone,
+                                   zip_code=zip_code, is_def=True)
+        else:
+            # 用户有默认收货地址
+            addr = self.create_one_object(passport_id=passport_id, recipient_name=recipient_name,
+                                          recipient_addr=recipient_addr, recipient_phone=recipient_phone,
+                                          zip_code=zip_code)
+        return addr
+
+
+class Address(BaseModel):
+    '''
+    地址模型类
+    '''
+    passport = models.ForeignKey('Passport', verbose_name='所属账户')
+    recipient_name = models.CharField(max_length=20, verbose_name='收件人')
+    recipient_addr = models.CharField(max_length=256, verbose_name='收件地址')
+    recipient_phone = models.CharField(max_length=11, verbose_name='联系电话')
+    zip_code = models.CharField(max_length=6, verbose_name='邮政编码')
+    is_def = models.BooleanField(default=False, verbose_name='是否默认')
+
+    objects = AddressManager()
+
+    class Meta:
+        db_table = 's_user_address'
+
+
+
+
+
+
+
+
+
+
+

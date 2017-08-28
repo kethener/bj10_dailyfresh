@@ -8,8 +8,10 @@ $(function(){
 
 
 	$('#user_name').blur(function() {
-		check_user_name();
-		check_user_name_exist2(true)
+		check_user_name()
+		if (error_name == false){
+			check_user_name_exist2(true)
+		}
 	});
 
 	$('#pwd').blur(function() {
@@ -38,45 +40,48 @@ $(function(){
 		}
 	});
 
-	function check_user_name_exist2(async){
+	function check_user_name_exist2(async) {
 		// 1.获取用户名
 		username = $('#user_name').val()
-
-		//　２．发起一个ａｊａｘ请求校验用户名是否存在
+		// 2.发起一个ajax请求校验用户名是否存在
 		$.ajax({
 			'url':'/user/check_user_name_exist/?username='+username,
-			'async':false,
-			'success':function(data){
-				//进行处理
+			'async':async,
+			'success':function (data) {
+				// 进行处理
 				if (data.res == 0){
+					// 用户名已注册
 					$('#user_name').next().text('用户名已注册').show()
 					error_name = true
 				}
-				else{
+				else
+				{
 					$('#user_name').next().text('').hide()
 					error_name = false
 				}
-
-			}
+            }
 		})
-	}
+    }
 
-	function check_user_name_exist(){
+	function check_user_name_exist() {
 		// 1.获取用户名
 		username = $('#user_name').val()
-		//　２．发起一个ａｊａｘ请求校验用户迷宫是否存在
-		$.get('/user/check_user_name_exist/?username='+username, function(data){
+		// 2.发起一个ajax请求校验用户名是否存在
+		$.get('/user/check_user_name_exist/?username='+username, function (data) {
+			// 进行处理
 			if (data.res == 0){
+				// 用户名已注册
 				$('#user_name').next().text('用户名已注册').show()
-				error_name=true
+				error_name = true
+				alert('check')
 			}
 			else
 			{
 				$('#user_name').next().text('').hide()
-				error_name=false
+				error_name = false
 			}
-		})
-	}
+        })
+    }
 
 	function check_user_name(){
 		var len = $('#user_name').val().length;
@@ -123,8 +128,7 @@ $(function(){
 		{
 			$('#cpwd').next().hide();
 			error_check_password = false;
-		}		
-		
+		}
 	}
 
 	function check_email(){
@@ -141,12 +145,12 @@ $(function(){
 			$('#email').next().show();
 			error_check_password = true;
 		}
-
 	}
 
-
-	$('#reg_form').submit(function() {
+	$('#reg_form2').submit(function() {
 		check_user_name();
+		//check_user_name_exist();//回调函数没有执行就往下走
+		// 发起一个同步的ajax请求
 		check_user_name_exist2(false);
 		check_pwd();
 		check_cpwd();
@@ -160,14 +164,5 @@ $(function(){
 		{
 			return false;
 		}
-
 	});
-
-
-
-
-
-
-
-
 })

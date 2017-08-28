@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 Django settings for dailyfresh project.
 
@@ -38,8 +37,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'djcelery',# 注册ｄｊｃｅｌｅｒｙ
+    'djcelery', # 注册djcelery
+    'tinymce', # 富文本编辑器
     'df_user', # 用户模块
+    'df_goods', # 商品模块
 )
 
 MIDDLEWARE_CLASSES = (
@@ -51,6 +52,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'utils.middleware.UrlRecordMiddleware', # 记录url地址中间件类
 )
 
 ROOT_URLCONF = 'dailyfresh.urls'
@@ -109,18 +111,25 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # 设置静态文件存放的物理目录
 
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 25
-# 发送邮件的邮箱
-EMAIL_HOST_USER = 'kethener@163.com'
-# 在邮箱中设置的客户端授权密码
-EMAIL_HOST_PASSWORD = 'jia930320'
-# 收件人看到的发件人
-EMAIL_FROM = '天天生鲜官网<kethener@163.com>'
+#发送邮件的邮箱
+EMAIL_HOST_USER = 'smartli_it@163.com'
+#在邮箱中设置的客户端授权密码
+EMAIL_HOST_PASSWORD = 'smartli123'
+#收件人看到的发件人
+EMAIL_FROM = 'dailyfresh<smartli_it@163.com>'
 
-
+# celery配置
 import djcelery
 djcelery.setup_loader()
 BROKER_URL = 'redis://127.0.0.1:6379/2'
 
+# 富文本编辑器的配置
+TINYMCE_DEFAULT_CONFIG = {
+    'theme': 'advanced',
+    'width': 600,
+    'height': 400,
+}
