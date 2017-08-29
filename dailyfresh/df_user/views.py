@@ -1,14 +1,14 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponseNotAllowed,JsonResponse
-from django.core.mail import send_mail # 导入发送邮件函数
+from django.http import HttpResponseNotAllowed, JsonResponse
+# from django.core.mail import send_mail # 导入发送邮件函数
+# from django.conf import settings
 from df_user.models import Passport,Address
-from django.conf import settings
-from django.views.decorators.http import require_POST,require_GET,require_http_methods
-from df_user.tasks import register_success_send_mail # 导入发送邮件任务函数
-from utils.decorators import login_required # 导入用户登录判断装饰器函数
-from datetime import datetime,timedelta
+from django.views.decorators.http import require_POST, require_GET,require_http_methods
+from df_user.tasks import register_success_send_mail  # 导入发送邮件任务函数
+from utils.decorators import login_required  # 导入用户登录判断装饰器函数
+from datetime import datetime, timedelta
 
-import time
+# import time
 
 # Create your views here.
 
@@ -21,11 +21,11 @@ import time
 #     return wrapper
 
 # =====================================注册=============================================
+
+
 @require_http_methods(['GET', 'POST'])
 def register(request):
-    '''
-    显示用户注册页面
-    '''
+    """显示用户注册页面"""
     if request.method == 'GET':
         # 显示用户注册页面
         return render(request, 'register.html')
@@ -46,9 +46,9 @@ def register(request):
 
 
 def check_user_name_exist(request):
-    '''
+    """
     校验用户名是否存在
-    '''
+    """
     # 1.接收用户名
     username = request.GET.get('username')
     # 2.根据用户名查找账户信息
@@ -56,17 +56,17 @@ def check_user_name_exist(request):
     # 3.判断返回值返回json数据
     if passport is None:
         # 用户名可用 {'res':1}
-        return JsonResponse({'res':1})
+        return JsonResponse({'res': 1})
     else:
         # 用户名已注册 {'res':0}
-        return JsonResponse({'res':0})
+        return JsonResponse({'res': 0})
 
 
 @require_POST
 def register_handle(request):
-    '''
+    """
     进行用户注册
-    '''
+    """
     # 1.接收用户的注册信息
     username = request.POST.get('user_name')
     password = request.POST.get('pwd')
@@ -82,11 +82,13 @@ def register_handle(request):
     return redirect('/user/login/')
 
 # =====================================登录=============================================
+
+
 # /user/login/
 def login(request):
-    '''
+    """
     显示登录页面
-    '''
+    """
     # 1.获取cookie username的信息 request.COOKIES
     if 'username' in request.COOKIES:
         username = request.COOKIES['username']
@@ -96,9 +98,9 @@ def login(request):
 
 
 def login_check(request):
-    '''
+    """
     进行用户登录校验
-    '''
+    """
     # 1.获取用户名和密码
     username = request.POST.get('username')
     password = request.POST.get('password')
@@ -129,10 +131,11 @@ def login_check(request):
         request.session['username'] = username
         return jres # HttpResponse
 
+
 def logout(request):
-    '''
+    """
     退出登录
-    '''
+    """
     # 清空登录用户的session信息
     request.session.flush()
     # 跳转到首页
@@ -143,9 +146,9 @@ def logout(request):
 @require_http_methods(['GET','POST'])
 @login_required
 def address(request):
-    '''
+    """
     用户中心-地址页
-    '''
+    """
     passport_id = request.session.get('passport_id')
     if request.method == 'GET':
         # 显示用户中心地址页面
@@ -169,25 +172,27 @@ def address(request):
         # 4.刷新地址页面
         return render(request, 'user_center_site.html', {'addr':addr, 'page':'addr'})
 
+
 # /user/
 @login_required
 def user(request):
-    '''
+    """
     用户中心－个人信息页
-    '''
+    """
     # 0.获取登录账户id
     passport_id = request.session.get('passport_id')
     # 1.查收用户的默认收货地址
     addr = Address.objects.get_default_address(passport_id=passport_id)
-    return render(request, 'user_center_info.html', {'addr':addr, 'page':'user'})
+    return render(request, 'user_center_info.html', {'addr': addr, 'page':'user'})
+
 
 # /user/order/
 @login_required
 def order(request):
-    '''
+    """
     用户中心-订单页
-    '''
-    return render(request, 'user_center_order.html', {'page':'order'})
+    """
+    return render(request, 'user_center_order.html', {'page': 'order'})
 
 
 # def test(request):

@@ -3,13 +3,13 @@ import copy
 
 
 class BaseManager(models.Manager):
-    '''
+    """
     抽象模型管理器基类
-    '''
+    """
     def get_all_valid_fields(self):
-        '''
+        """
         获取self所在模型类的有效属性的字符串列表
-        '''
+        """
         # 1.获取self所在的模型类
         model_class = self.model
         # 2.获取model_class模型类的属性元组
@@ -27,9 +27,9 @@ class BaseManager(models.Manager):
         return str_attr_list
 
     def create_one_object(self, **kwargs):
-        '''
+        """
         添加一个self所在模型类的对象
-        '''
+        """
         # 1.获取self所在模型类的有效属性的字符串列表
         valid_fields = self.get_all_valid_fields()
         # 2.拷贝一份kwargs
@@ -49,11 +49,16 @@ class BaseManager(models.Manager):
         return obj
 
     def get_one_object(self, **filters):
-        '''
+        """
         根据filters条件查询self.model模型类的对象
-        '''
+        """
         try:
             obj = self.get(**filters)
         except self.model.DoesNotExist:
             obj = None
         return obj
+
+    def get_object_list(self, filters={}, exclude_filters={}, order_by=('-pk',)):
+        """查询self.model模型类对应的查询集"""
+        object_list = self.filter(**filters).exclude(**exclude_filters).order_by(*order_by)
+        return object_list
