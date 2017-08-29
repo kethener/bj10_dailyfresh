@@ -49,6 +49,18 @@ def goods_list(request, goods_type_id, page_index):
     pages = paginator.page_range
     # 取第page_index页的内容　有上一页:has_previous 有下一页:has_next 当前页:number
     goods_li = paginator.page(int(page_index))
+
+    if len(pages) > 5:
+        if goods_li.number <= 3:
+            pages = pages[:5]
+        elif goods_li.number >= (len(pages)-2):
+            pages = pages[-5:]
+        else:
+            start = goods_li.number-3
+            end = goods_li.number+2
+            pages = pages[start:end]
+    else:
+        pages = pages
     # 获取商品的新品信息
     goods_new_li = Goods.objects_logic.get_goods_list_by_type(goods_type_id=goods_type_id, limit=2, sort='new')
     context = {'goods_li': goods_li, 'goods_new_li': goods_new_li,
