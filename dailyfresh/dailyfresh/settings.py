@@ -52,7 +52,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'utils.middleware.UrlRecordMiddleware', # 记录url地址中间件类
+    'utils.middleware.UrlRecordMiddleware',  # 记录url地址中间件类
 )
 
 ROOT_URLCONF = 'dailyfresh.urls'

@@ -46,10 +46,11 @@ class GoodsManager(BaseManager):
         """根据商品种类的id获取商品的信息"""
         if sort == 'new':
             # 按照新品进行排序
+            # 减号为从高到低，不加为从低到高
             order_by = ('-create_time',)
         elif sort == 'price':
             # 按照价格查询商品
-            order_by = ('-goods_price',)
+            order_by = ('goods_price',)
         elif sort == 'hot':
             # 按照热度查询商品
             order_by = ('-goods_sales',)

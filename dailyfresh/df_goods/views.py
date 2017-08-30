@@ -69,26 +69,48 @@ def goods_list(request, goods_type_id, page_index):
     paginator = Paginator(goods_li, 1)
     # 获取页码列表
     pages = paginator.page_range
+
+    # 将字符串page_index转换成数字
+    page_index = int(page_index)
+
+    # 第二种:
+    # 控制页码列表，大于５页的时候只显示５页内容
+    if len(pages) < 5:
+        # 当页码列表不到５页的时候，就全部显示
+        pages = pages
+    elif page_index <= 3:
+        # 判断如果当前页是前三页，那么就只显示前５页
+        pages = pages[:5]
+    elif page_index >= (len(pages) - 2):
+        # 如果当前页是后三页，那么就只显示后５页
+        pages = pages[-5:]
+    else:
+        # 如果当前页不在上述范围内，那么当前页就显示在中间位置
+        start = page_index - 3
+        end = page_index + 2
+        pages = pages[start:end]
+
+# """第一种：
+#     # 控制页码列表，大于５页的时候只显示５页内容
+#
+#     if len(pages) > 5:
+#         # 判断如果当前页是前三页，那么就只显示前５页
+#         if goods_li.number <= 3:
+#             pages = pages[:5]
+#         # 如果当前页是后三页，那么就只显示后５页
+#         elif goods_li.number >= (len(pages)-2):
+#             pages = pages[-5:]
+#         # 如果当前页不在上述范围内，那么当前页就显示在中间位置
+#         else:
+#             start = goods_li.number-3
+#             end = goods_li.number+2
+#             pages = pages[start:end]
+#     # 当页码列表不到５页的时候，就全部显示
+#     else:
+#         pages = pages
+# """
     # 取第page_index页的内容　有上一页:has_previous 有下一页:has_next 当前页:number
     goods_li = paginator.page(int(page_index))
-
-    # 控制页码列表，大于５页的时候只显示５页内容
-    if len(pages) > 5:
-        # 判断如果当前页是前三页，那么就只显示前５页
-        if goods_li.number <= 3:
-            pages = pages[:5]
-        # 如果当前页是后三页，那么就只显示后５页
-        elif goods_li.number >= (len(pages)-2):
-            pages = pages[-5:]
-        # 如果当前页不在上述范围内，那么当前页就显示在中间位置
-        else:
-            start = goods_li.number-3
-            end = goods_li.number+2
-            pages = pages[start:end]
-    # 当页码列表不到５页的时候，就全部显示
-    else:
-        pages = pages
-
     # 获取商品的新品信息
     goods_new_li = Goods.objects_logic.get_goods_list_by_type(goods_type_id=goods_type_id, limit=2, sort='new')
     context = {'goods_li': goods_li, 'goods_new_li': goods_new_li,

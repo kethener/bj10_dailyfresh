@@ -1,8 +1,6 @@
 
 class UrlRecordMiddleware(object):
-    '''
-    url记录中间件
-    '''
+    """url记录中间件"""
     # process_request(self, request) # 产生request对象之后，url匹配之前
     # process_view(self, request, view_func, *view_args, **view_kwargs) url匹配之后，视图函数调用之前
     exclude_path = ['/user/login/', '/user/login_check/', '/user/logout/',
