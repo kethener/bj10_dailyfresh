@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'djcelery',  # 注册djcelery
     'df_user',  # 用户模块
 )
 
@@ -110,3 +111,19 @@ STATICFILES_DIRS = [
     # 设置静态文件存放的物理目录
     os.path.join(BASE_DIR, 'static')
 ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.163.com'
+EMAIL_PORT = 25
+# 发送邮件的邮箱
+EMAIL_HOST_USER = 'kethener@163.com'
+# 在邮箱中设置的客户端授权密码
+EMAIL_HOST_PASSWORD = 'jia930320'
+# 收件人看到的发件人
+EMAIL_FROM = '天天生鲜官网<kethener@163.com>'
+
+
+# celery配置
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = 'redis://127.0.0.1:6379/2'

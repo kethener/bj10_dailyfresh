@@ -9,6 +9,9 @@ $(function(){
 
 	$('#user_name').blur(function() {
 		check_user_name();
+		if(error_name == false){
+			check_user_name_exist(true)
+		}
 	});
 
 	$('#pwd').blur(function() {
@@ -36,6 +39,31 @@ $(function(){
 			$(this).siblings('span').show();
 		}
 	});
+
+
+	function check_user_name_exist(async){
+		// 1.获取用户名
+		username = $('#user_name').val()
+		// 2.发起一个ajax请求校验用户名是否存在
+		$.ajax({
+			'url':'/user/check_user_name_exist/?username='+username,
+			'async':async,
+			'success':function(data){
+				//进行处理
+				if (data.res == 0){
+					//用户名已经注册
+					$('#user_name').next().text('用户名已经注册').show()
+					error_name=true
+				}
+				else
+				{
+					$('#user_name').next().text('').hide()
+					error_name=false
+				}
+			}
+
+		})
+	}
 
 
 	function check_user_name(){
@@ -105,8 +133,10 @@ $(function(){
 	}
 
 
-	$('#reg_form').submit(function() {
+	$('#reg_form2').submit(function() {
 		check_user_name();
+		// 发起一个同步的ajax请求
+		check_user_name_exist(false);
 		check_pwd();
 		check_cpwd();
 		check_email();
@@ -121,12 +151,5 @@ $(function(){
 		}
 
 	});
-
-
-
-
-
-
-
 
 })

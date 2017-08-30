@@ -1,5 +1,7 @@
 from django.db import models
 from db.base_models import BaseModel
+from util.get_hash import get_hash
+
 # Create your models here.
 
 
@@ -11,7 +13,7 @@ class PassportManager(models.Manager):
         model_class = self.model
         passport = model_class()
         passport.username = username
-        passport.password = password
+        passport.password = get_hash(password)
         passport.email = email
         # 保存到数据库
         passport.save()
@@ -26,7 +28,7 @@ class PassportManager(models.Manager):
                 passport = self.get(username=username)
             else:
                 # 根据用户名和密码查找账户
-                passport = self.get(username=username, password=password)
+                passport = self.get(username=username, password=get_hash(password))
         except self.model.DoesNotExist:
                 passport = None
         return passport
