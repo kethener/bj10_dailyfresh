@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'djcelery',  # 注册djcelery
     'df_user',  # 用户模块
+    'df_goods',
 )
 
 MIDDLEWARE_CLASSES = (
