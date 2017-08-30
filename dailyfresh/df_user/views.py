@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
-from df_user.models import Passport
-
+from df_user.models import Passport, Address
+from util.decorators import login_required
 from df_user.tasks import register_success_send_mail  # 导入自定义发送函数类
 
 # from django.conf import settings
@@ -63,7 +63,18 @@ def login_check(request):
         if remember == 'true':
             # 设置一个cookie 信息 username, 记住用户名
             jres.set_cookie('username', username, expires=datetime.now() + timedelta(days=14))
+        request.session['is_login'] = True
+        request.session['passport_id'] = passport.id
+        request.session['username'] = username
         return jres
+
+
+def logout(request):
+    """退出登陆"""
+    # 清空session
+    request.session.flush()
+    # 跳转到首页
+    return redirect('/')
 
 
 def check_user_name_exist(request):
@@ -81,3 +92,44 @@ def check_user_name_exist(request):
         return JsonResponse({'res': 0})
 
 
+@require_http_methods(['GET', 'POST'])
+@login_required
+def address(request):
+    """用户中心-地址页"""
+    passport_id = request.session.get('passport_id')
+    if request.method == 'GET':
+        # 显示用户中心地址页面
+        # 1. 查询用户的默认收货地址
+        addr = Address.objects.get_default_address(passport_id=passport_id)
+        return render(request, 'user_center_site.html', {'addr': addr, 'page': 'addr'})
+    else:
+        # 添加一个收货地址
+        # 0.获取登陆用户的id
+        # 1.接收用户的收件地址信息
+        recipient_name = request.POST.get('uname')
+        recipient_addr = request.POST.get('addr')
+        recipient_phone = request.POST.get('phone')
+        zip_code = request.POST.get('zip_code')
+        Address.objects.add_one_address(passport_id=passport_id, recipient_name=recipient_name,
+                                        recipient_addr=recipient_addr, recipient_phone=recipient_phone,
+                                        zip_code=zip_code)
+        # 3.查询用户的默认收货地址信息
+        addr = Address.objects.get_default_address(passport_id=passport_id)
+        return render(request, 'user_center_site.html', {'addr': addr, 'page': 'addr'})
+
+
+@login_required
+def user(request):
+    """用户中心-个人信息"""
+    # １．获取登陆账号id
+    passport_id = request.session.get('passport_id')
+    # 2. 查询用户的默认收货地址
+    addr = Address.objects.get_default_address(passport_id=passport_id)
+    return render(request, 'user_center_info.html', {'addr': addr, 'page': 'user'})
+
+
+@login_required
+def order(request):
+    """用户中心-订单信息"""
+
+    return render(request, 'user_center_order.html', {'page': 'order'})
