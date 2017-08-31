@@ -8,7 +8,7 @@ class BaseManager(models.Manager):
         """获取self所在模型类的有效属性的字符串列表"""
         # 1.获取self所在的模型类
         model_class = self.model
-        # 2. 获取model_class模型类的属性元组　　　　(<类型：名字>,.....)＝＝》(<BooleanFields:is_def>,....)
+        # 2. 获取model_class模型类的属性元组　　　　(<类型：名字>,.....)＝＝》(<BooleanFields:is_def>,<CharFields:passport>,....)
         attr_tuple = model_class._meta.get_fields()
         str_attr_list = []
         for attr in attr_tuple:

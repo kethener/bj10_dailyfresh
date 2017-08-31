@@ -39,7 +39,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'djcelery',  # 注册djcelery
     'df_user',  # 用户模块
-    'df_goods',
+    'df_goods',  # 商品模块
+    'tinymce',  # 添加富文本编辑器应用
 )
 
 MIDDLEWARE_CLASSES = (
@@ -128,3 +129,10 @@ EMAIL_FROM = '天天生鲜官网<kethener@163.com>'
 import djcelery
 djcelery.setup_loader()
 BROKER_URL = 'redis://127.0.0.1:6379/2'
+
+
+TINYMCE_DEFAULT_CONFIG = {
+    'theme': 'advanced',
+    'width': 600,
+    'height': 400,
+}
