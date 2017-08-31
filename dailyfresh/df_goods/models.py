@@ -109,6 +109,13 @@ class ImageManager(BaseManager):
             images.img_url = ''
         return images
 
+    def get_images_by_goods_id_list(self, goods_id_list):  # __in
+        '''
+        根据goods_id_list获取图片的查询集
+        '''
+        image_list = self.get_object_list(filters={'goods_id__in': goods_id_list})
+        return image_list
+
 
 class Image(BaseModel):
     """商品图片模型类"""

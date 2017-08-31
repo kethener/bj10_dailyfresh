@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'haystack',  # 全文检索
     'djcelery',  # 注册djcelery
     'tinymce',  # 富文本编辑器
     'df_user',  # 用户模块
@@ -133,3 +134,17 @@ TINYMCE_DEFAULT_CONFIG = {
     'width': 600,
     'height': 400,
 }
+
+# 全文搜索配置
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        # 使用whoosh引擎
+        'ENGINE': 'haystack.backends.whoosh_cn_backend.WhooshEngine',
+        # 索引文件路径
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    }
+}
+# 当添加、修改、删除数据时，自动生成索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+# 配置搜索到的内容每页显示多少个信息
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 6

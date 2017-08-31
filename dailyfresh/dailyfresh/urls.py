@@ -18,6 +18,7 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^search/', include('haystack.urls')),
     url(r'^tinymce/', include('tinymce.urls')),  # 富文本编辑器
     url(r'^user/', include('df_user.urls')),  # 用户模块
     url(r'^', include('df_goods.urls')),  # 商品模块

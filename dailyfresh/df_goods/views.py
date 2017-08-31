@@ -1,6 +1,7 @@
 from django.core.paginator import Paginator  # 导入分页类
+from django.http import JsonResponse
 from django.shortcuts import render
-from df_goods.models import GoodsInfo, Goods
+from df_goods.models import GoodsInfo, Goods, Image
 from df_goods.enums import *
 
 # Create your views here.
@@ -117,3 +118,19 @@ def goods_list(request, goods_type_id, page_index):
                'type_id': goods_type_id, 'type_title': GOODS_TYPE[int(goods_type_id)],
                'pages': pages, 'sort': sort}
     return render(request, 'list.html', context)
+
+
+def get_image_list(request):
+    """根据商品的id列表获取商品的图片信息"""
+    # 1.接收参数goods_id_list 1,2,3
+    goods_id_list = request.GET.get('goods_id_list')
+    # 将字符串按照逗号拆分，并且返回一个列表
+    goods_id_list = goods_id_list.split(',')
+    # 2.根据商品的id列表获取商品的图片查询集, Image.objects.get_images_by_goods
+    image_list = Image.objects.get_images_by_goods_id_list(goods_id_list=goods_id_list)
+    img_dict = {}
+    for image in image_list:
+        # image.goods_id是商品id  , image.img_url.name是商品图片的路径，存到字典里
+        img_dict[image.goods_id] = image.img_url.name
+    return JsonResponse({'img_dict': img_dict})
+

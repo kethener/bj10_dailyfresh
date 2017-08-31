@@ -118,7 +118,7 @@ def login_check(request):
         # else:
         #     next = '/' # 默认跳转到首页
         next = request.session.get('pre_url_path', '/')
-        jres = JsonResponse({'res':1, 'next':next})
+        jres = JsonResponse({'res': 1, 'next': next})
         # 判断是否需要记住用户名
         remember = request.POST.get("remember")
         # print(type(remember))
@@ -129,7 +129,7 @@ def login_check(request):
         request.session['is_login'] = True
         request.session['passport_id'] = passport.id
         request.session['username'] = username
-        return jres # HttpResponse
+        return jres  # HttpResponse
 
 
 def logout(request):
