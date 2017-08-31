@@ -47,3 +47,8 @@ class BaseManager(models.Manager):
         except self.model.DoesNotExist:
             obj = None
         return obj
+
+    def get_object_list(self, filters={}, exclude_filters={}, order_by=('-pk',)):
+        """查询self.model模型类对应的查询集　Queryset"""
+        object_list = self.filter(**filters).exclude(**exclude_filters).order_by(*order_by)
+        return object_list
