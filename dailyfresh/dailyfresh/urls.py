@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^tinymce/', include('tinymce.urls')),  # 富文本编辑器
     url(r'^user/', include('df_user.urls')),  # 用户模块
     url(r'^', include('df_goods.urls')),  # 商品模块
+    url(r'^cart/', include('df_cart.urls'))
 ]

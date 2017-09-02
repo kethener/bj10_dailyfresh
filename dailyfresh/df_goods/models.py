@@ -26,7 +26,7 @@ class GoodsLoginManager(BaseManager):
             goods.img_url = img.img_url  # ''当图片不存在的时候，代码不会出错，而是会赋值为空字符串
         return goods_list
 
-    def get_goods_by_id(self,goods_id):
+    def get_goods_by_id(self, goods_id):
         """根据商品的id获取商品信息"""
         goods = Goods.objects.get_goods_by_id(goods_id=goods_id)
         img = Image.objects.get_image_by_goods_id(goods_id=goods.id)

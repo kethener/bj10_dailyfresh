@@ -129,6 +129,7 @@ def login_check(request):
         request.session['is_login'] = True
         request.session['passport_id'] = passport.id
         request.session['username'] = username
+
         return jres  # HttpResponse
 
 
