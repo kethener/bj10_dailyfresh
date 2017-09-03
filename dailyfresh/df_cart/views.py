@@ -40,4 +40,7 @@ def cart_count(request):
     return JsonResponse({'res': res})
 
 
+def cart_show(request):
+    """显示购物车"""
+    return render(request, 'cart.html')
 
