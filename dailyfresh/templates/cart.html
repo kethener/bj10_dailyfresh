@@ -6,9 +6,11 @@
     <script src="{% static 'js/jquery-1.12.4.min.js' %}"></script>
     <script>
         $(function(){
+
             update_all_goods_info()
-{#            update_cart_count()#}
+            update_cart_count()
             //计算所有商品的总数和总价格
+
             function update_all_goods_info(){
                 goods_total_count = 0
                 goods_total_price = 0
@@ -17,12 +19,12 @@
                     res_dict = update_goods_info($(this))
                     //将每个被选中的商品的小计和数目累加获得总数和总价格
                     goods_total_count += res_dict['goods_count']
-                    goods_total_price += res_dict['goods_price']
+                    goods_total_price += res_dict['total_price']
                     //设置商品的总数和总价
-                    $('.settlements').find('em').text(goods_total_price)
-                    $('.settlements').find('b').text(goods_total_count)
 
                 })
+                $('.settlements').find('em').text(goods_total_price.toFixed(2)+'元')
+                    $('.settlements').find('b').text(goods_total_count)
             }
             //计算某一个商品的小计
             function update_goods_info(goods_ul){
@@ -35,19 +37,88 @@
                 //3.计算商品的小计
                 total_price = goods_count*goods_price
                 //4.设置商品的小计
-                goods_ul.children('.col07').text(total_price)
+                goods_ul.children('.col07').text(total_price.toFixed(2)+'元')
                 //5.设置返回值
-                return {'goods_count':goods_count, 'goods_price':goods_price}
+                return {'goods_count':goods_count, 'total_price':total_price}
 
 
             }
+
+
+            //全选和全不选
+            $('.settlements').find(':checkbox').change(function(){
+                 //1.获取当前checkbox的选中状态
+                is_checked = $(this).prop('checked')
+                //alert(is_checked)
+                //2.遍历并设置商品ul中checkbox的选中状态
+                $('.cart_list_td').find(':checkbox').each(function(){
+                    //设置每个goods  ul 中checkbox的选中状态
+                    $(this).prop('checked', is_checked)
+
+                })
+                update_all_goods_info()
+            })
+
+
+            //商品对应的checkbox发生改变是，全选checkbox发生改变
+            $('.cart_list_td').find(':checkbox').change(function(){
+                //获取商品所有checkbox的数目
+                all_len = $('.cart_list_td').find(':checkbox').length
+                //获取选中商品的checkbox的数目
+                checked_len = $('.cart_list_td').find(':checked').length
+                //alert(all_len +':'+checked_len)
+                //比较选中商品的数目和全部商品的数目的大小，
+                if(checked_len < all_len){
+                    //没有选中所有的商品
+                    $('.settlements').find(':checkbox').prop('checked', false)
+
+                }
+                else
+                {
+                    //所有商品都被选中
+                    $('.settlements').find(':checkbox').prop('checked', true)
+
+                }
+                update_all_goods_info()
+            })
+
+            //更新页面上购物车中商品的数目
+            function update_cart_count(){
+                $.get('/cart/count/', function(data){
+                    $('.total_count').children('em').text(data.res)
+                })
+
+            }
+
+            //更新数据库中购物车表s_cart
+            error_update = false //false代表默认更新成功
+            function update_remote_cart_count(goods_id, goods_count){
+                $.ajax({
+                    'url':'/cart/update/?goods_id='+goods_id+'goods_count'+goods_count,
+                    'async':false, //同步
+                    'success':function(data){
+                        //返回的json数据说明更新是否成功
+                        if (data.res == 0)
+                        {
+                            //0为更新失败
+                            error_update = true
+                        }
+                        else
+                        {
+                            //否则更新成功
+                            erro_update = false
+                        }
+                    }
+                })
+            }
+
         })
     </script>
 {% endblock topfiles %}
 
 
 {% block body %}
-	<div class="total_count">全部商品<em>2</em>件</div>	
+	<div class="total_count">全部商品<em>2</em>件</div>
 	<ul class="cart_list_th clearfix">
 		<li class="col01">商品名称</li>
 		<li class="col02">商品单位</li>
@@ -56,27 +127,32 @@
 		<li class="col05">小计</li>
 		<li class="col06">操作</li>
 	</ul>
+    <form method="post" action="/order/">
+    {% csrf_token %}
+        {% for cart_info in cart_list %}
 	<ul class="cart_list_td clearfix">
-		<li class="col01"><input type="checkbox" name="" checked></li>
-		<li class="col02"><img src="images/goods/goods012.jpg"></li>
-		<li class="col03">奇异果<br><em>25.80元/500g</em></li>
-		<li class="col04">500g</li>
-		<li class="col05">25.80元</li>
+		<li class="col01"><input type="checkbox" name="cart_id_list" value="{{ cart_info.id }}" checked></li>
+		<li class="col02"><img src="{% static cart_info.goods.img_url %}"></li>
+		<li class="col03">{{ cart_info.goods.goods_name }}<br><em>{{ cart_info.goods.goods_price }}/{{ cart_info.goods.goods_unite }}</em></li>
+
+		<li class="col04">{{ cart_info.goods.goods_unite }}</li>
+		<li class="col05">{{ cart_info.goods.goods_price }}</li>
 		<li class="col06">
 			<div class="num_add">
 				<a href="javascript:;" class="add fl">+</a>
-				<input type="text" class="num_show fl" value="1">	
-				<a href="javascript:;" class="minus fl">-</a>	
+				<input type="text" class="num_show fl" goods_id="{{ cart_info.goods.id }}" value="{{ cart_info.goods_count }}">
+				<a href="javascript:;" class="minus fl">-</a>
 			</div>
 		</li>
 		<li class="col07">25.80元</li>
-		<li class="col08"><a href="javascript:;">删除</a></li>
+		<li class="col08"><a href="javascript:;" cart_id="{{ cart_info.id }}">删除</a></li>
 	</ul>
-
+        {% endfor %}
 	<ul class="settlements">
 		<li class="col01"><input type="checkbox" name="" checked=""></li>
 		<li class="col02">全选</li>
 		<li class="col03">合计(不含运费)：<span>¥</span><em>42.60</em><br>共计<b>2</b>件商品</li>
 		<li class="col04"><a href="place_order.html">去结算</a></li>
 	</ul>
+    </form>
 {% endblock body %}

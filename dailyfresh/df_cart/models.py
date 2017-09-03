@@ -3,6 +3,19 @@ from django.db.models import Sum  # 导入聚合函数
 from db.base_manager import BaseManager
 from db.base_model import BaseModel
 # Create your models here.
+from df_goods.models import Image
+
+
+class CartLogicManager(BaseManager):
+    """定义购物车逻辑模型管理器类"""
+    def get_cart_list_by_passport(self, passport_id):
+        """根据passport_id查询用户的购物车查询集"""
+        cart_list = Cart.objects.get_cart_list_by_passport(passport_id=passport_id)
+        for cart_info in cart_list:
+            # 根据商品的id获取商品的图片
+            img = Image.objects.get_image_by_goods_id(goods_id=cart_info.goods.id)
+            cart_info.goods.img_url = img.img_url
+        return cart_list
 
 
 class CartManager(BaseManager):
@@ -14,7 +27,7 @@ class CartManager(BaseManager):
         cart_info = self.get_one_object(passport_id=passport_id, goods_id=goods_id)
         return cart_info
 
-    def add_one_cart_info(self,passport_id, goods_id, goods_count):
+    def add_one_cart_info(self, passport_id, goods_id, goods_count):
         """添加购物车记录"""
         cart_info = self.get_one_cart_info(passport_id=passport_id, goods_id=goods_id)
         # 判断用户的购物车中是否已经添加过该商品
@@ -30,7 +43,7 @@ class CartManager(BaseManager):
 
     def get_cart_count_by_passport(self, passport_id):
         """根据passport_id获取购物车中的商品的总数"""
-        # 根据账户获取商品的查询集，再进行聚合函数操作，返回字典，结果为{'goods_count__sum':结果}
+        # 根据账户获取购物车中商品的查询集，再进行聚合函数操作，返回字典，结果为{'goods_count__sum':结果}
         res_dict = self.get_object_list(filters={'passport_id': passport_id}).aggregate(Sum('goods_count'))
         # 对字典进行取值，
         res = res_dict['goods_count__sum']
@@ -38,6 +51,24 @@ class CartManager(BaseManager):
         if res is None:
             res = 0
         return res
+
+    def get_cart_list_by_passport(self, passport_id):
+        """根据passport_id查询购物车信息"""
+        cart_list = self.get_object_list(filters={'passport_id': passport_id})
+        return cart_list
+
+    def update_cart_info_by_passport(self, passport_id, goods_id, goods_count):
+        """根据账户id获取购物车信息"""
+        cart_info = self.get_one_cart_info(passport_id=passport_id, goods_id=goods_id)
+        if cart_info.goods.goods_stock < goods_count:
+            # 库存不足
+            return False
+        else:
+            # 库存足够,在数据库中购物车表中更新当前商品数量
+            cart_info.goods_count = goods_count
+            cart_info.save()
+            return True
+
 
 
 class Cart(BaseModel):
@@ -47,6 +78,6 @@ class Cart(BaseModel):
     goods_count = models.IntegerField(default=1, verbose_name='商品数量')
 
     objects = CartManager()
-
+    objects_logic = CartLogicManager()
     class Meta:
         db_table = 's_cart'

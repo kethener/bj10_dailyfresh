@@ -40,7 +40,32 @@ def cart_count(request):
     return JsonResponse({'res': res})
 
 
+@login_required
 def cart_show(request):
     """显示购物车"""
-    return render(request, 'cart.html')
+    # 1.获取登陆用户id
+    passport_id = request.session.get('passport_id')
+    # 2.根据passport_id查询用户的购物车信息   get_cart_list_by_passport(passport_id)
+    cart_list = Cart.objects_logic.get_cart_list_by_passport(passport_id=passport_id)
+    return render(request, 'cart.html', {'cart_list': cart_list})
 
+
+@require_GET
+@login_required
+def cart_update(request):
+    """更新用户购物车中商品的数目"""
+    # 1.用GET方法接收数据
+    goods_id = request.GET.get('goods_id')
+    goods_count = request.GET.get('goods_count')
+    # 2.获取账户id passport_id
+    passport_id = request.session.get('passport_id')
+    # 3.更新用户购物车中商品的数目
+    res = Cart.objects.update_cart_info_by_passport(passport_id=passport_id, goods_id=goods_id,
+                                                    goods_count=int(goods_count))
+    # 4.判断返回json
+    if res:
+        # 更新成功
+        return JsonResponse({'res': 1})
+    else:
+        # 更新失败
+        return JsonResponse({'res': 0})
