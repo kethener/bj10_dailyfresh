@@ -70,7 +70,6 @@ class CartManager(BaseManager):
             return True
 
 
-
 class Cart(BaseModel):
     """定义购物车模型类"""
     passport = models.ForeignKey('df_user.Passport', verbose_name='账户')
