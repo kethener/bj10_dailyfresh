@@ -232,6 +232,51 @@
 
             })
 
+            //删除购物车信息
+            $('.cart_list_td').children('.col08').children('a').click(function(){
+                //删除购物车中商品
+                //1.获取购物车信息的主键
+                cart_id = $(this).attr('cart_id')
+                alert(cart_id)
+                //2.获取当前商品的ul
+                goods_ul = $(this).parents('ul')
+
+                //2.删除购物车数据表s_cart表的记录
+                error_update = false
+                $.ajax({
+                    'url':'/cart/del/?cart_id='+cart_id,
+                    'async':false,
+                    'success':function(date){
+                        // 判断json数据进行处理{'res': 1}{'res': 0}
+                        if(date.res == 0)
+                        {
+                            // 删除失败
+                            error_update = true
+                        }
+                        else
+                        {
+                            //删除成功
+                            error_update = false
+                        }
+                    }
+
+                })
+
+                if(error_update == false)
+                {
+                    //删除成功，一处页面上的ul元素
+                    goods_ul.remove()
+                    // 判断当前商品是否选中
+                    is_checked = goods_ul.find(':checkbox').prop('checked')
+                    if(is_checked == true)
+                    {
+                        //商品被选中，更新所有商品信息
+                        update_all_goods_info()
+                    }
+                    // 更新购物车中商品的数量
+                    update_cart_count()
+                }
+            })
 
         })
     </script>

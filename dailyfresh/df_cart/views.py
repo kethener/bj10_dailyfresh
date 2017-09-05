@@ -69,3 +69,20 @@ def cart_update(request):
     else:
         # 更新失败
         return JsonResponse({'res': 0})
+
+
+@require_GET
+@login_required
+def cart_del(request):
+    """删除购物车记录"""
+    # 1.获取购物车主键cart_id
+    cart_id = request.GET.get('cart_id')
+    # 2.根据cart_id删除购物车信息
+    res = Cart.objects.del_cart_info_by_id(cart_id=cart_id)
+    # 3.判断删除成功还是失败，返回值返回json数据
+    if res:
+        # 删除成功
+        return JsonResponse({'res': 1})
+    else:
+        # 删除失败
+        return JsonResponse({'res': 0})

@@ -67,7 +67,7 @@ def goods_list(request, goods_type_id, page_index):
     # 根据商品类型id获取商品信息
     goods_li = Goods.objects_logic.get_goods_list_by_type(goods_type_id=goods_type_id, sort=sort)
     # 分页
-    paginator = Paginator(goods_li, 1)
+    paginator = Paginator(goods_li, 2)
     # 获取页码列表
     pages = paginator.page_range
 
